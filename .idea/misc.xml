@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$PROJECT_DIR$/business" />
+    <file type="web" url="file://$PROJECT_DIR$/identity" />
+    <file type="web" url="file://$PROJECT_DIR$/notification" />
+    <file type="web" url="file://$PROJECT_DIR$/product" />
+    <file type="web" url="file://$PROJECT_DIR$/restaurant" />
+    <file type="web" url="file://$PROJECT_DIR$/review" />
+    <file type="web" url="file://$PROJECT_DIR$/service" />
+    <file type="web" url="file://$PROJECT_DIR$/user-profile" />
+  </component>
+  <component name="ProjectRootManager">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>
