@@ -3,18 +3,6 @@ spring:
     name: identity
   profiles:
     active: dev
-  datasource:
-    username: soknem
-    password: 123
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://143.198.83.9:5430/oauth2
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
 
   config:
     import: "optional:configserver:"

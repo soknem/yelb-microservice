@@ -1,6 +1,6 @@
 spring:
   application:
-    name: vs
+    name: gateway-server
   profiles:
     active: dev
   config:
@@ -8,6 +8,11 @@ spring:
   cloud:
     config:
       uri: http://localhost:8888
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
 
 management:
   endpoints:
@@ -19,3 +24,4 @@ management:
       enabled: true
     health:
       show-details: always
+
