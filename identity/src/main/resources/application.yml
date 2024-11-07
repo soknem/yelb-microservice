@@ -1,4 +1,51 @@
 spring:
   application:
     name: identity
+  profiles:
+    active: dev
+  datasource:
+    username: soknem
+    password: 123
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://143.198.83.9:5430/oauth2
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
+  config:
+    import: "optional:configserver:"
+  cloud:
+    config:
+      uri: http://localhost:8888
+    stream:
+      kafka:
+        binder:
+          brokers: 143.198.83.9:9092
+    bus:
+      trace:
+        enabled: true
+      refresh:
+        enabled: true
+      env:
+        enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+logging:
+  level:
+    org:
+      springframework:
+        security: debug
+        web: debug
+server:
+  port: 8080

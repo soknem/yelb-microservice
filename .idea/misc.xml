@@ -4,6 +4,8 @@
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$/business" />
     <file type="web" url="file://$PROJECT_DIR$/config-server" />
+    <file type="web" url="file://$PROJECT_DIR$/eureka" />
+    <file type="web" url="file://$PROJECT_DIR$/gateway-server" />
     <file type="web" url="file://$PROJECT_DIR$/identity" />
     <file type="web" url="file://$PROJECT_DIR$/notification" />
     <file type="web" url="file://$PROJECT_DIR$/product" />
