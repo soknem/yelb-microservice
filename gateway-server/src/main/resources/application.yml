@@ -25,3 +25,27 @@ management:
     health:
       show-details: always
 
+client-security-matchers: >
+  /login/**,
+  /oauth2/**,
+  /logout/**,
+  /en/**,
+  /auth/**,
+  /business/**,
+  /profile/**,
+  /api/v1/categories/**
+
+client-permit-matchers: >
+  /login/**,
+  /oauth2/**,
+  /en/**,
+  /auth/**,
+  /contactSupport/**,
+  /error/**,
+  /actuator/**,
+  /info/**,
+  /health/**,
+  /prometheus/**,
+  /business/**,
+  /profile/**,
+  /api/v1/categories/**

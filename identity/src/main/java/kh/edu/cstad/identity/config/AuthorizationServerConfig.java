@@ -5,6 +5,7 @@ import com.nimbusds.jose.proc.SecurityContext;
 import kh.edu.cstad.identity.repository.JpaRegisteredClientRepository;
 import kh.edu.cstad.identity.repository.UserRepository;
 import kh.edu.cstad.identity.service.CustomUserDetailService;
+import kh.edu.cstad.identity.service.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,13 +33,14 @@ import org.springframework.security.oauth2.server.authorization.settings.TokenSe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
+import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
+import org.springframework.security.core.Authentication;
 
 import java.time.Duration;
-import java.util.List;
-import java.util.UUID;
+import java.util.HashSet;
+import java.util.Set;
 
 @Configuration()
 @RequiredArgsConstructor
@@ -83,34 +85,45 @@ public class AuthorizationServerConfig {
     @Primary
     public RegisteredClientRepository registeredClientRepository() {
 
-        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("api-client")
-//                    .clientSecret(passwordEncoder.encode("secret"))
-                .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://127.0.0.1:8089/login/oauth2/code/api-client")
-                .scope("api.read")
-                .scope(OidcScopes.OPENID)
-                .scope(OidcScopes.PROFILE)
+        TokenSettings tokenSettings =TokenSettings.builder()
+                .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
+                .accessTokenTimeToLive(Duration.ofDays(1))
+                .reuseRefreshTokens(false)
+                .refreshTokenTimeToLive(Duration.ofDays(3))
+                .build();
+        ClientSettings clientSettings = ClientSettings.builder()
+                .requireProofKey(true)
+                .requireAuthorizationConsent(true)
+                .build();
+
+        var web = RegisteredClient
+                .withId("nextjs")
+                .clientId("nextjs")
+                .clientSecret(passwordEncoder.encode("nextjs123"))
                 .scopes(scopes -> {
-                    scopes.add("api.read");
                     scopes.add(OidcScopes.OPENID);
                     scopes.add(OidcScopes.PROFILE);
                 })
-                .tokenSettings(TokenSettings.builder()
-                        .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
-                        .accessTokenTimeToLive(Duration.ofMinutes(30))
-                        .refreshTokenTimeToLive(Duration.ofDays(30))
-                        .reuseRefreshTokens(false)
-                        .build())
-                .clientSettings(
-                        ClientSettings.builder()
-                                .requireAuthorizationConsent(true)
-                                .requireProofKey(true).build())
+                .redirectUris(uri->{
+                    uri.add("http://localhost:8085/login/oauth2/code/nextjs");
+                })
+                .postLogoutRedirectUris(uri->{
+                    uri.add("http://localhost:8085");
+                })
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                .authorizationGrantTypes(grantTypes->{
+                    grantTypes.add(AuthorizationGrantType.AUTHORIZATION_CODE);
+                    grantTypes.add(AuthorizationGrantType.REFRESH_TOKEN);
+                })
+                .clientSettings(clientSettings)
+                .tokenSettings(tokenSettings)
                 .build();
 
-        jpaRegisteredClientRepository.save(registeredClient);
+        RegisteredClient registeredClient = jpaRegisteredClientRepository.findByClientId("nextjs");
+
+        if (registeredClient == null) {
+            jpaRegisteredClientRepository.save(web);
+        }
 
         return jpaRegisteredClientRepository;
     }
@@ -151,13 +164,45 @@ public class AuthorizationServerConfig {
     }
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*")); //allows React to access the API from origin on port 3000. Change accordingly
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
-        configuration.addAllowedHeader("*");
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
+    OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer() {
+        return context -> {
+
+            Authentication authentication = context.getPrincipal();
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
+            if (context.getTokenType().getValue().equals("id_token")) {
+                context.getClaims().claim("soknem", "pov-soknem2");
+            }
+
+            if (context.getTokenType().getValue().equals("access_token")) {
+                Set<String> scopes = new HashSet<>(context.getAuthorizedScopes());
+                authentication
+                        .getAuthorities()
+                        .forEach(grantedAuthority -> scopes.add(grantedAuthority.getAuthority()));
+                context.getClaims()
+                        .id(authentication.getName())
+                        .subject(authentication.getName())
+                        .claim("scope", scopes);
+//                        .claim("id", customUserDetails.getUser().getId()==null?"1":customUserDetails.getUser().getId());
+//                        .claim("email", customUserDetails.getUser().getEmail()==null?"email":
+//                                customUserDetails.getUser().getEmail()); // Add email claim
+//                        .claim("name", customUserDetails.getUser().getName()==null?"name":customUserDetails.getUser().getName());
+
+            }
+        };
     }
+//
+//    @Bean
+//    CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.setAllowedOrigins(List.of("*")); //allows React to access the API from origin on port 3000. Change accordingly
+//        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+//        configuration.addAllowedHeader("*");
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", configuration);
+//        return source;
+//    }
+
+
+
 }

@@ -29,18 +29,31 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         return checkPassword(user,password);
     }
 
-    private Authentication checkPassword(UserDetails user,String rawPassword){
+//    private Authentication checkPassword(UserDetails user,String rawPassword){
+//
+//        if(passwordEncoder.matches(rawPassword,user.getPassword())){
+//            return new UsernamePasswordAuthenticationToken(
+//                    user.getUsername(),
+//                    user.getPassword(),
+//                    user.getAuthorities()
+//            );
+//        }else{
+//            throw new BadCredentialsException("Bad credential");
+//        }
+//    }
 
-        if(passwordEncoder.matches(rawPassword,user.getPassword())){
+    private Authentication checkPassword(UserDetails user, String rawPassword) {
+        if (passwordEncoder.matches(rawPassword, user.getPassword())) {
             return new UsernamePasswordAuthenticationToken(
-                    user.getUsername(),
+                    user, // Use the full UserDetails object (CustomUserDetails)
                     user.getPassword(),
                     user.getAuthorities()
             );
-        }else{
+        } else {
             throw new BadCredentialsException("Bad credential");
         }
     }
+
 
     @Override
     public boolean supports(Class<?> authentication) {

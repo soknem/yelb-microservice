@@ -37,7 +37,8 @@ public class JpaRegisteredClientRepository implements RegisteredClientRepository
         this.objectMapper.registerModules(securityModules);
         this.objectMapper.registerModule(new OAuth2AuthorizationServerJackson2Module());
 
-        this.objectMapper.addMixIn(CustomUserDetailsMixin.class, CustomUserDetails.class);
+//        this.objectMapper.addMixIn(CustomUserDetailsMixin.class, CustomUserDetails.class);
+        this.objectMapper.addMixIn(CustomUserDetails.class, CustomUserDetailsMixin.class);
     }
 
     @Override
