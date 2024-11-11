@@ -1,15 +1,15 @@
 package kh.edu.cstad.business.domain;
 
-import jakarta.persistence.*;
-import kh.edu.cstad.business.config.jpa.Auditable;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
-@Entity
-@Table(name = "additional-informations")
-public class AdditionalInformation extends Auditable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Getter
+@Setter
+@NoArgsConstructor
+public class AdditionalInformation {
+
+    private String accept;
+    private String notAccept;
 
 }

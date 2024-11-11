@@ -20,7 +20,7 @@ import java.sql.Timestamp;
 @Setter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class Auditable {
+public abstract class Auditable<T> {
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
